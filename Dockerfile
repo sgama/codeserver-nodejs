@@ -1,23 +1,16 @@
+FROM codercom/code-server:latest
 
-FROM node:latest
-
-ENV CSVERSION=1.1156-vsc1.33.1
-ENV CODESERVER=https://github.com/codercom/code-server/releases/download/${CSVERSION}/code-server${CSVERSION}-linux-x64.tar.gz \
-    VSCODE_EXTENSIONS="/root/.local/share/code-server/extensions" \
+ENV VSCODE_EXTENSIONS="/root/.local/share/code-server/extensions" \
     LANG=en_US.UTF-8 \
     DISABLE_TELEMETRY=true
 
-ADD $CODESERVER code-server.tar
-
-RUN mkdir -p code-server \
-    && tar -xf code-server.tar -C code-server --strip-components 1 \
-    && cp code-server/code-server /usr/local/bin \
-    && rm -rf code-server* \
-    && apt-get update -y && apt-get upgrade -y \
-    && apt-get install -y --no-install-recommends git locales htop curl wget tmux bsdtar net-tools \
-    && apt-get autoremove -y \
+WORKDIR /
+# Install dev dependencies
+RUN apt-get update && apt-get install -y npm nodejs wget curl git bsdtar \
+    && mkdir -p code-server \
     && locale-gen en_US.UTF-8 \
     && mkdir /root/project
+RUN apt-get update && apt-get install -y libssl-dev libffi-dev python-dev apt-transport-https lsb-release software-properties-common node-typescript
 RUN mkdir -p ${VSCODE_EXTENSIONS}/babelextension \
     && curl -JLs --retry 5 https://marketplace.visualstudio.com/_apis/public/gallery/publishers/mgmcdermott/vsextensions/vscode-language-babel/latest/vspackage | bsdtar --strip-components=1 -xf - -C ${VSCODE_EXTENSIONS}/babelextension extension \
     && mkdir -p ${VSCODE_EXTENSIONS}/eslintextextension \
