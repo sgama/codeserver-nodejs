@@ -4,9 +4,7 @@ services:
   codeserver-nodejs:
     image: solardesigner/codeserver-nodejs:latest
     container_name: codeserver-nodejs
-    command: --allow-http --no-auth
-    environment:
-      - DISABLE_TELEMETRY=true
+    command: --allow-http --no-auth --disable-telemetry
     expose:
       - 8443
     ports:
